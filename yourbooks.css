@@ -1,0 +1,246 @@
+/* ================================
+   GLOBAL RESET & BACKGROUND
+================================ */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to right, #6a11cb, #2575fc);
+    color: white;
+}
+
+/* ================================
+   NAVBAR (Matches Browsebooks)
+================================ */
+.navbar {
+    width: 100%;
+    max-width: 900px;
+    margin: 20px auto 25px auto;
+    background: rgba(255, 255, 255, 0.15);
+    padding: 15px 25px;
+    border-radius: 12px;
+    backdrop-filter: blur(12px);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.25);
+}
+
+.navbar h2 {
+    font-size: 24px;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #e3e9ff;
+    font-weight: bold;
+    transition: .3s;
+}
+
+.nav-links a.active,
+.nav-links a:hover {
+    color: #ffdd57;
+}
+
+.nav-links button {
+    padding: 7px 15px;
+    border: none;
+    background: #ff4d4d;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.nav-links button:hover {
+    background: #c40000;
+}
+
+/* ================================
+   PAGE TITLE
+================================ */
+.title {
+    text-align: center;
+    font-size: 32px;
+    font-weight: bold;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+/* ================================
+   MAIN CONTAINER (Glass effect)
+================================ */
+.books-wrapper {
+    width: 90%;
+    max-width: 850px;
+    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.13);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.3);
+    backdrop-filter: blur(8px);
+}
+
+/* ================================
+   BOOK CARD DESIGN (Matches screenshot)
+================================ */
+.book-card {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 20px;
+    display: flex;
+    border-radius: 15px;
+    margin-bottom: 25px;
+    gap: 20px;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+    transition: .3s;
+}
+
+.book-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 22px rgba(0,0,0,0.25);
+}
+
+.book-img {
+    width: 130px;
+    height: 190px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.book-info h2 {
+    margin: 0;
+    color: #1f2937;
+    font-size: 22px;
+}
+
+.author {
+    color: #4a5568;
+}
+
+.desc {
+    margin: 10px 0;
+    color: #444;
+}
+
+.details-btn {
+    color: #2575fc;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.details-btn:hover {
+    color: #1749aa;
+}
+
+.buttons {
+    margin-top: 15px;
+}
+
+.edit-btn,
+.delete-btn {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    color: white;
+}
+
+.edit-btn {
+    background-color: #2575fc;
+}
+
+.edit-btn:hover {
+    background-color: #1749aa;
+}
+
+.delete-btn {
+    background-color: #ff4d4d;
+}
+
+.delete-btn:hover {
+    background-color: #c82333;
+}
+
+/* ================================
+   FLOATING BUTTON
+================================ */
+/* ================================
+   UPDATED FLOATING ADD BUTTON
+================================ */
+.floating-btn {
+    position: fixed;
+    right: 25px;
+    bottom: 25px;
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(to bottom, #ffd84f, #ffb300);
+    border: none;
+    border-radius: 50%;
+    font-size: 36px;
+    font-weight: bold;
+    color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.floating-btn:hover {
+    transform: scale(1.12);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.45);
+}
+
+/* ================================
+   MODAL
+================================ */
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: white;
+    padding: 20px;
+    width: 350px;
+    border-radius: 12px;
+}
+
+.modal-content input,
+.modal-content textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 6px;
+    margin-bottom: 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+.save-btn, .close-btn {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+}
+
+.save-btn {
+    background: #2575fc;
+}
+
+.close-btn {
+    background: #ff4d4d;
+}

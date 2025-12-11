@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Review Hub - Book Details</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 40px;
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            color: white;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        .book-header {
+            display: flex;
+            gap: 25px;
+            align-items: flex-start;
+            background: rgba(255,255,255,0.25);
+            padding: 20px;
+            border-radius: 12px;
+        }
+
+        .book-header img {
+            width: 200px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .book-header h2 {
+            color: #fff;
+            font-size: 26px;
+            margin-bottom: 10px;
+        }
+
+        .book-header p {
+            color: #e8e8e8;
+            margin-bottom: 8px;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid rgba(255,255,255,0.4);
+            margin: 30px 0;
+        }
+
+        /* Review form */
+        label {
+            font-size: 16px;
+            margin-top: 10px;
+            display: block;
+        }
+
+        textarea, select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 8px;
+            border: none;
+            font-size: 15px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #ffffff;
+            color: #2575fc;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #e6e6e6;
+        }
+
+        #reviewsSection {
+            background: rgba(255,255,255,0.2);
+            padding: 20px;
+            border-radius: 12px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Book Review Hub</h1>
+
+    <div class="book-header">
+        <img id="bookImage" src="" alt="Book Cover">
+        <div>
+            <h2 id="bookTitle"></h2>
+            <p><strong>Author:</strong> <span id="bookAuthor"></span></p>
+            <p><strong>Description:</strong> <span id="bookDescription"></span></p>
+        </div>
+    </div>
+
+    <hr>
+
+    <h3>Leave a Review</h3>
+
+    <form id="reviewForm">
+        <label>Rate the book:</label>
+        <select required>
+            <option value="">Select rating</option>
+            <option value="1">⭐ 1</option>
+            <option value="2">⭐⭐ 2</option>
+            <option value="3">⭐⭐⭐ 3</option>
+            <option value="4">⭐⭐⭐⭐ 4</option>
+            <option value="5">⭐⭐⭐⭐⭐ 5</option>
+        </select>
+
+        <label>Your Review:</label>
+        <textarea placeholder="Write your review..." rows="4" required></textarea>
+
+        <button type="submit">Submit Review</button>
+    </form>
+
+    <hr>
+
+    <h3>Recent Reviews</h3>
+    <div id="reviewsSection">
+        <p>No reviews yet. Be the first to review!</p>
+    </div>
+</div>
+
+
+<!-- ⭐ FIREBASE + BOOK LOADING -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+/* Firebase Config */
+const firebaseConfig = {
+    apiKey: "AIzaSyBkg27rRNmoOnF586b-Zcs1uf4CwXB289s",
+    authDomain: "bookregistration-59dbf.firebaseapp.com",
+    projectId: "bookregistration-59dbf",
+    storageBucket: "bookregistration-59dbf.firebasestorage.app",
+    messagingSenderId: "571572414110",
+    appId: "1:571572414110:web:2c8c72042b9b1b5cdebd8f",
+    measurementId: "G-CM92P8DFVQ"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+/* Get URL Param */
+const params = new URLSearchParams(window.location.search);
+const id = params.get("id");  // Firestore ID
+const staticBook = params.get("book"); // Pre-made book key
+
+/* Pre-made book database */
+const books = {
+    "the-hobbit": {
+        title: "The Hobbit",
+        author: "J.R.R. Tolkien",
+        description: "A fantasy novel about Bilbo Baggins and his unexpected adventure.",
+        imageURL: "hobbit.webp"
+    },
+    "harry-potter": {
+        title: "Harry Potter and the Sorcerer's Stone",
+        author: "J.K. Rowling",
+        description: "A young wizard discovers his magical heritage.",
+        imageURL: "harry.jpg"
+    },
+    "1984": {
+        title: "1984",
+        author: "George Orwell",
+        description: "A dystopian novel about government surveillance.",
+        imageURL: "1984.webp"
+    }
+};
+
+/* -------- LOAD BOOK -------- */
+async function loadBook() {
+    // 1️⃣ LOAD USER-ADDED BOOK FROM FIRESTORE
+    if (id) {
+        const ref = doc(db, "books", id);
+        const snap = await getDoc(ref);
+
+        if (snap.exists()) {
+            const b = snap.data();
+            document.getElementById("bookTitle").textContent = b.title;
+            document.getElementById("bookAuthor").textContent = b.author;
+            document.getElementById("bookDescription").textContent = b.description;
+            document.getElementById("bookImage").src = b.imageURL || "placeholder.png";
+            return;
+        }
+    }
+
+    // 2️⃣ LOAD PRE-MADE BOOK
+    if (staticBook && books[staticBook]) {
+        const b = books[staticBook];
+        document.getElementById("bookTitle").textContent = b.title;
+        document.getElementById("bookAuthor").textContent = b.author;
+        document.getElementById("bookDescription").textContent = b.description;
+        document.getElementById("bookImage").src = b.imageURL;
+        return;
+    }
+
+    // 3️⃣ NOT FOUND
+    document.getElementById("bookTitle").textContent = "Book Not Found";
+    document.getElementById("bookAuthor").textContent = "N/A";
+    document.getElementById("bookDescription").textContent = "No description available.";
+}
+
+loadBook();
+</script>
+
+
+<!-- ⭐ REVIEW SYSTEM -->
+<script>
+document.getElementById("reviewForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const rating = this.querySelector("select").value;
+    const reviewText = this.querySelector("textarea").value;
+
+    const reviewsSection = document.getElementById("reviewsSection");
+
+    if (reviewsSection.querySelector("p")) {
+        reviewsSection.innerHTML = "";
+    }
+
+    const newReview = `
+        <div style="
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(6px);
+            padding: 15px;
+            border-radius: 12px;
+            margin-top: 12px;
+            border: 1px solid rgba(255,255,255,0.25);
+            color: white;
+        ">
+            <strong>Rating:</strong> ${"⭐".repeat(rating)}<br>
+            <strong>Review:</strong> ${reviewText}
+        </div>
+    `;
+
+    reviewsSection.innerHTML += newReview;
+
+    this.reset();
+});
+</script>
+
+</body>
+</html>

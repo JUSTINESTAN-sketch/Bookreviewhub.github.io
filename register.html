@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Book Review Hub - Register</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #fff;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 30px;
+            border-radius: 12px;
+            width: 330px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            margin-bottom: 10px;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            font-weight: 300;
+        }
+
+        input {
+            width: 90%;
+            padding: 12px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        button {
+            width: 95%;
+            padding: 12px;
+            background: #fff;
+            color: #2575fc;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: #e6e6e6;
+        }
+
+        #message {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #ffe;
+        }
+
+        .login-link {
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        .login-link a {
+            color: #fff;
+            font-weight: bold;
+            text-decoration: underline;
+        }
+
+        .login-link a:hover {
+            color: #ffd;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Book Review Hub</h1>
+        <h2>Create Account</h2>
+
+        <form id="registerForm">
+
+            <input type="text" id="firstName" placeholder="First Name" required />
+            <input type="text" id="lastName" placeholder="Last Name" required />
+
+            <input type="email" id="email" placeholder="Email" required />
+            <input type="password" id="password" placeholder="Password" required />
+
+            <button type="submit">Register</button>
+        </form>
+
+        <p id="message"></p>
+
+        <p class="login-link">
+            Already have an account? <a href="index.html">Log in here</a>
+        </p>
+    </div>
+
+<!-- Firebase SDK -->
+<script type="module">
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBkg27rRNmoOnF586b-Zcs1uf4CwXB289s",
+        authDomain: "bookregistration-59dbf.firebaseapp.com",
+        projectId: "bookregistration-59dbf",
+        storageBucket: "bookregistration-59dbf.firebasestorage.app",
+        messagingSenderId: "571572414110",
+        appId: "1:571572414110:web:2c8c72042b9b1b5cdebd8f",
+        measurementId: "G-CM92P8DFVQ"
+    };
+
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword } 
+        from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+
+    import { getFirestore, doc, setDoc }
+        from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    document.getElementById("registerForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const firstName = document.getElementById("firstName").value.trim();
+        const lastName = document.getElementById("lastName").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value;
+
+        try {
+            // Create user auth account
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+
+            // Save to Firestore
+            await setDoc(doc(db, "users", user.uid), {
+                firstName: firstName,
+                lastName: lastName,
+                email: email,
+                createdAt: new Date()
+            });
+
+            document.getElementById("message").innerText =
+                "✔ Account created successfully! Redirecting...";
+
+            setTimeout(() => {
+                window.location.href = "index.html"; // login page
+            }, 3000);
+
+        } catch (error) {
+            document.getElementById("message").innerText =
+                "Error: " + error.message;
+        }
+    });
+
+</script>
+
+</body>
+</html>

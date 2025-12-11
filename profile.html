@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>User Profile</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: "Poppins", Arial, sans-serif;
+    background: linear-gradient(135deg, #5d26c1, #1e88e5);
+    padding: 20px;
+    color: #fff;
+}
+
+/* NAVBAR */
+.navbar {
+    width: 100%;
+    background: rgba(255,255,255,0.12);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 30px;
+    border-radius: 14px;
+    margin-bottom: 35px;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.25);
+}
+
+.nav-brand {
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+}
+
+.nav-center {
+    display: flex;
+    gap: 40px;
+}
+
+.nav-center a {
+    color: #fff;
+    font-size: 19px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: 0.3s ease;
+}
+
+.nav-center a:hover {
+    color: #ffeb3b;
+}
+
+.nav-right {
+    display: flex;
+    gap: 15px;
+}
+
+#downloadAppBtn {
+    background: #0b5e61;
+    color: white;
+    padding: 10px 22px;
+    border-radius: 30px;
+    border: none;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+#logoutBtn {
+    background: #e53935;
+    padding: 8px 18px;
+    border-radius: 8px;
+    border: none;
+    color: #fff;
+    font-weight: 600;
+}
+
+/* CONTAINER */
+.container {
+    max-width: 600px;
+    margin: auto;
+    background: rgba(255,255,255,0.10);
+    padding: 40px 35px;
+    border-radius: 20px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.35);
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 32px;
+}
+
+/* Form */
+label {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    margin-top: 6px;
+    margin-bottom: 18px;
+    font-size: 16px;
+}
+
+button.saveBtn {
+    width: 100%;
+    padding: 14px;
+    background: #1e88e5;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+button.saveBtn:hover {
+    background: #5e35b1;
+}
+
+.success {
+    margin-top: 10px;
+    color: #00e676;
+    font-weight: 600;
+}
+
+.error {
+    margin-top: 10px;
+    color: #ff5252;
+    font-weight: 600;
+}
+</style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar">
+    <div class="nav-brand">Book Review Hub</div>
+
+    <div class="nav-center">
+        <a href="browse-books.html">Home</a>
+        <a href="yourbooks.html">My Books</a>
+        <a href="profile.html">Profile</a>
+    </div>
+
+    <div class="nav-right">
+        <button id="downloadAppBtn">Download app</button>
+        <button id="logoutBtn">Logout</button>
+    </div>
+</div>
+
+<!-- PROFILE CONTAINER -->
+<div class="container">
+    <h2>Edit Profile</h2>
+
+    <label>First Name</label>
+    <input type="text" id="firstName">
+
+    <label>Last Name</label>
+    <input type="text" id="lastName">
+
+    <label>Email</label>
+    <input type="email" id="email">
+
+    <label>Phone Number</label>
+    <input type="number" id="phone">
+
+    <button class="saveBtn" id="saveBtn">Save Changes</button>
+
+    <div id="message"></div>
+</div>
+
+<!-- FIREBASE SCRIPT -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+import { getAuth, onAuthStateChanged, updateEmail, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyBkg27rRNmoOnF586b-Zcs1uf4CwXB289s",
+    authDomain: "bookregistration-59dbf.firebaseapp.com",
+    projectId: "bookregistration-59dbf",
+    storageBucket: "bookregistration-59dbf.firebasestorage.app",
+    messagingSenderId: "571572414110",
+    appId: "1:571572414110:web:2c8c72042b9b1b5cdebd8f"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+/* ------------------------------
+   LOAD USER DATA
+------------------------------ */
+onAuthStateChanged(auth, async (user) => {
+    if (!user) { 
+        window.location.href = "index.html"; 
+        return; 
+    }
+
+    const snap = await getDoc(doc(db, "users", user.uid));
+    if (snap.exists()) {
+        const data = snap.data();
+        document.getElementById("firstName").value = data.firstName || "";
+        document.getElementById("lastName").value = data.lastName || "";
+        document.getElementById("phone").value = data.phone || "";
+    }
+
+    document.getElementById("email").value = user.email;
+});
+
+/* ------------------------------
+   LOGOUT FUNCTION
+------------------------------ */
+document.getElementById("logoutBtn").onclick = () => {
+    signOut(auth).then(() => {
+        window.location.href = "index.html";
+    });
+};
+
+/* ------------------------------
+   SAVE PROFILE CHANGES
+------------------------------ */
+document.getElementById("saveBtn").addEventListener("click", async () => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const first = document.getElementById("firstName").value.trim();
+    const last = document.getElementById("lastName").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+
+    const message = document.getElementById("message");
+    message.textContent = "";
+
+    try {
+        // Update Firestore
+        await updateDoc(doc(db, "users", user.uid), {
+            firstName: first,
+            lastName: last,
+            phone: phone
+        });
+
+        // Update Email only if changed
+        if (email !== user.email) {
+            await updateEmail(user, email);
+        }
+
+        message.textContent = "Profile updated successfully!";
+        message.className = "success";
+
+    } catch (error) {
+        message.textContent = error.message;
+        message.className = "error";
+    }
+});
+</script>
+
+</body>
+</html>

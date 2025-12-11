@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Your Books</title>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #5d26c1, #1e88e5);
+            padding: 30px;
+            color: #fff;
+        }
+
+        /* ---------------- NAVBAR ---------------- */
+        .navbar {
+            width: 100%;
+            background: rgba(255,255,255,0.12);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 30px;
+            border-radius: 14px;
+            margin-bottom: 35px;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 4px 18px rgba(0,0,0,0.25);
+        }
+
+        .nav-brand {
+            font-size: 22px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .nav-center {
+            display: flex;
+            gap: 40px;
+        }
+
+        .nav-center a {
+            color: #fff;
+            font-size: 19px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: 0.25s;
+        }
+
+        .nav-center a:hover {
+            color: #ffeb3b;
+            transform: translateY(-2px);
+        }
+
+        /* Container for right side buttons */
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* Download app button */
+        #downloadAppBtn {
+            background: #0b5e61;
+            color: white;
+            padding: 10px 22px;
+            border-radius: 30px;
+            border: none;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: background 0.3s ease, transform 0.3s ease;
+        }
+
+        #downloadAppBtn:hover {
+            background: #0a4d4f;
+            transform: translateY(-2px);
+        }
+
+        #logoutBtn {
+            background: #e53935;
+            padding: 8px 18px;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            transition: 0.25s;
+        }
+
+        #logoutBtn:hover {
+            background: #c62828;
+            transform: translateY(-2px);
+        }
+
+        /* ---------------- CONTAINER ---------------- */
+        .container {
+            max-width: 850px;
+            margin: auto;
+            background: rgba(255, 255, 255, 0.13);
+            padding: 40px;
+            border-radius: 18px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 6px 22px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .user-greeting {
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #e6eaff;
+        }
+
+        h1 { 
+            text-align: center; 
+            margin-bottom: 30px; 
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        /* ---------------- BOOK CARD ---------------- */
+        .book {
+            background: rgba(255,255,255,0.95);
+            color: #333;
+            padding: 22px;
+            margin-bottom: 22px;
+            border-radius: 14px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: 0.25s;
+        }
+
+        .book:hover {
+            transform: translateY(-5px);
+        }
+
+        .book img {
+            width: 120px;
+            height: 180px;
+            border-radius: 10px;
+            object-fit: cover;
+        }
+
+        .action-buttons {
+            margin-top: 10px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .edit-btn, .delete-btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            color: white;
+        }
+
+        .edit-btn { background: #ff9800; }
+        .delete-btn { background: #e53935; }
+
+        .view-details-btn {
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            color: white;
+            padding: 10px 22px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            display: inline-block;
+            text-decoration: none;
+            transition: 0.25s;
+        }
+
+        .view-details-btn:hover {
+            transform: scale(1.07);
+        }
+
+        .floating-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            background: #ffeb3b;
+            color: #333;
+            border: none;
+            font-size: 38px;
+            cursor: pointer;
+            box-shadow: 0 5px 16px rgba(0,0,0,0.3);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.65);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: #fff;
+            color: #333;
+            width: 400px;
+            padding: 25px;
+            border-radius: 12px;
+        }
+
+        .modal-content input, .modal-content textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+
+        .save-btn, .close-btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .save-btn { background: #2575fc; }
+        .close-btn { background: #e53935; }
+    </style>
+</head>
+
+<body>
+
+<!-- ---------------- NAVBAR ---------------- -->
+<div class="navbar">
+    <div class="nav-brand">Book Review Hub</div>
+    <div class="nav-center">
+        <a href="browse-books.html">Home</a>
+        <a href="yourbooks.html">My Books</a>
+        <a href="profile.html">Profile</a>
+    </div>
+    <div class="nav-right">
+        <button id="downloadAppBtn">Download app</button>
+        <button id="logoutBtn">Logout</button>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="user-greeting" id="userGreeting">Hello, Loading...</div>
+
+    <h1>Your Books</h1>
+
+    <div id="userBooksContainer"></div>
+</div>
+
+<button id="addBookBtn" class="floating-btn">+</button>
+
+<!-- Add Modal -->
+<div id="addBookModal" class="modal">
+<div class="modal-content">
+    <h2>Add a Book</h2>
+
+    <label>Cover URL</label>
+    <input id="bookImageURL">
+
+    <label>Book Title</label>
+    <input id="bookTitle">
+
+    <label>Author</label>
+    <input id="bookAuthor">
+
+    <label>Description</label>
+    <textarea id="bookDesc"></textarea>
+
+    <button id="saveBookBtn" class="save-btn">Save</button>
+    <button id="closeModalBtn" class="close-btn">Close</button>
+</div>
+</div>
+
+<!-- Edit Modal -->
+<div id="editBookModal" class="modal">
+<div class="modal-content">
+    <h2>Edit Book</h2>
+
+    <input id="editBookImageURL">
+    <input id="editBookTitle">
+    <input id="editBookAuthor">
+    <textarea id="editBookDesc"></textarea>
+
+    <button id="updateBookBtn" class="save-btn">Update</button>
+    <button id="closeEditModalBtn" class="close-btn">Close</button>
+</div>
+</div>
+
+<script type="module">
+/* Firebase Imports */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+import { getFirestore, doc, getDoc, addDoc, deleteDoc, collection, getDocs, updateDoc }
+from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+/* Firebase Config */
+const firebaseConfig = {
+    apiKey: "AIzaSyBkg27rRNmoOnF586b-Zcs1uf4CwXB289s",
+    authDomain: "bookregistration-59dbf.firebaseapp.com",
+    projectId: "bookregistration-59dbf",
+    storageBucket: "bookregistration-59dbf.firebasestorage.app",
+    messagingSenderId: "571572414110",
+    appId: "1:571572414110:web:2c8c72042b9b1b5cdebd8f"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+/* Global variable for edit */
+let editBookID = "";
+
+/* Logout */
+document.getElementById("logoutBtn").onclick = () => {
+    signOut(auth).then(() => window.location.href = "index.html");
+};
+
+/* User Greeting */
+onAuthStateChanged(auth, async (user) => {
+    if (!user) { window.location.href = "index.html"; return; }
+
+    const snap = await getDoc(doc(db, "users", user.uid));
+    document.getElementById("userGreeting").textContent =
+        snap.exists() ? `Hello ${snap.data().firstName}!` : "Hello User";
+
+    loadUserBooks();
+});
+
+/* Load User Books */
+async function loadUserBooks() {
+    const container = document.getElementById("userBooksContainer");
+    container.innerHTML = "";
+
+    const snapshot = await getDocs(collection(db, "books"));
+
+    snapshot.forEach(docSnap => {
+        const b = docSnap.data();
+        const id = docSnap.id;
+
+        container.innerHTML += `
+            <div class="book">
+                <img src="${b.imageURL}">
+                <div>
+                    <h2>${b.title}</h2>
+                    <p>by ${b.author}</p>
+
+                    <a href="book-details.html?id=${id}" class="view-details-btn">View Details</a>
+
+                    <div class="action-buttons">
+                        <button class="edit-btn" onclick="editBook('${id}')">Edit</button>
+                        <button class="delete-btn" onclick="deleteBook('${id}')">Delete</button>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+}
+
+/* Modal Controls */
+document.getElementById("addBookBtn").onclick = () =>
+    document.getElementById("addBookModal").style.display = "flex";
+
+document.getElementById("closeModalBtn").onclick = () =>
+    document.getElementById("addBookModal").style.display = "none";
+
+/* Add Book */
+document.getElementById("saveBookBtn").onclick = async () => {
+    const data = {
+        imageURL: document.getElementById("bookImageURL").value,
+        title: document.getElementById("bookTitle").value,
+        author: document.getElementById("bookAuthor").value,
+        description: document.getElementById("bookDesc").value
+    };
+
+    await addDoc(collection(db, "books"), data);
+    alert("Book added!");
+    document.getElementById("addBookModal").style.display = "none";
+    loadUserBooks();
+};
+
+/* Delete Book */
+window.deleteBook = async (id) => {
+    if (!confirm("Delete this book?")) return;
+    await deleteDoc(doc(db, "books", id));
+    loadUserBooks();
+};
+
+/* Edit Book */
+window.editBook = async (id) => {
+    editBookID = id;
+    const snap = await getDoc(doc(db, "books", id));
+    const b = snap.data();
+
+    document.getElementById("editBookImageURL").value = b.imageURL;
+    document.getElementById("editBookTitle").value = b.title;
+    document.getElementById("editBookAuthor").value = b.author;
+    document.getElementById("editBookDesc").value = b.description;
+
+    document.getElementById("editBookModal").style.display = "flex";
+};
+
+document.getElementById("closeEditModalBtn").onclick = () =>
+    document.getElementById("editBookModal").style.display = "none";
+
+/* Update Book */
+document.getElementById("updateBookBtn").onclick = async () => {
+    if (!editBookID) return;
+    await updateDoc(doc(db, "books", editBookID), {
+        imageURL: document.getElementById("editBookImageURL").value,
+        title: document.getElementById("editBookTitle").value,
+        author: document.getElementById("editBookAuthor").value,
+        description: document.getElementById("editBookDesc").value
+    });
+
+    alert("Updated!");
+    document.getElementById("editBookModal").style.display = "none";
+    loadUserBooks();
+};
+</script>
+
+</body>
+</html>

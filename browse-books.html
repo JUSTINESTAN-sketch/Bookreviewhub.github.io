@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Book Review Hub - Browse Books</title>
+
+<!-- LINK TO EXTERNAL CSS -->
+<link rel="stylesheet" href="browsebooks.css">
+
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar">
+    <div class="nav-brand">Book Review Hub</div>
+
+    <div class="nav-center">
+        <a href="browse-books.html">Home</a>
+        <a href="yourbooks.html">My Books</a>
+        <a href="profile.html">Profile</a>
+    </div>
+
+    <div class="nav-right">
+        <button id="downloadAppBtn">Download app</button>
+        <button id="logoutBtn">Logout</button>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="user-greeting" id="userGreeting">Hello, Loading...</div>
+
+    <h3>Browse Books</h3>
+
+    <!-- ⭐ SEARCH BAR ⭐ -->
+    <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Search books by title or author...">
+    </div>
+
+    <!-- BOOK LIST -->
+    <div class="book">
+        <img src="hobbit.webp" alt="The Hobbit">
+        <div>
+            <h2>The Hobbit</h2>
+            <p>by J.R.R. Tolkien</p>
+            <a href="book-details.html?book=the-hobbit">View Details</a>
+        </div>
+    </div>
+
+    <div class="book">
+        <img src="harry.jpg" alt="Harry Potter">
+        <div>
+            <h2>Harry Potter and the Sorcerer's Stone</h2>
+            <p>by J.K. Rowling</p>
+            <a href="book-details.html?book=harry-potter">View Details</a>
+        </div>
+    </div>
+
+    <div class="book">
+        <img src="1984.webp" alt="1984">
+        <div>
+            <h2>1984</h2>
+            <p>by George Orwell</p>
+            <a href="book-details.html?book=1984">View Details</a>
+        </div>
+    </div>
+
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyBkg27rRNmoOnF586b-Zcs1uf4CwXB289s",
+    authDomain: "bookregistration-59dbf.firebaseapp.com",
+    projectId: "bookregistration-59dbf",
+    storageBucket: "bookregistration-59dbf.firebasestorage.app",
+    messagingSenderId: "571572414110",
+    appId: "1:571572414110:web:2c8c72042b9b1b5cdebd8f"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+/* User greeting */
+onAuthStateChanged(auth, async (user) => {
+    if (!user) { window.location.href = "index.html"; return; }
+
+    const snap = await getDoc(doc(db, "users", user.uid));
+    document.getElementById("userGreeting").textContent = snap.exists()
+        ? `Hello ${snap.data().firstName} ${snap.data().lastName}!`
+        : "Hello User";
+});
+
+/* Logout */
+document.getElementById("logoutBtn").onclick = () => {
+    signOut(auth).then(() => window.location.href = "index.html");
+};
+
+/* ⭐ SEARCH FILTER ⭐ */
+document.getElementById("searchInput").addEventListener("input", function () {
+    const search = this.value.toLowerCase();
+    const books = document.querySelectorAll(".book");
+
+    books.forEach(book => {
+        const text = book.textContent.toLowerCase();
+        book.style.display = text.includes(search) ? "flex" : "none";
+    });
+});
+</script>
+
+</body>
+</html>
